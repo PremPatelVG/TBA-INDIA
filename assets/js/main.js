@@ -48,9 +48,8 @@ form?.addEventListener("submit", async (event) => {
   errorMessage?.classList.add("hidden");
   const endpoint = form.getAttribute("data-endpoint") || form.action;
   const data = new FormData(form);
-  data.set("_subject", "New website enquiry - TBA India");
-  data.set("_template", "table");
-  data.set("_captcha", "false");
+  const isNetlifyForm = form.hasAttribute("data-netlify");
+  if (isNetlifyForm && form.name) data.set("form-name", form.name);
 
   if (submitButton) {
     submitButton.disabled = true;
@@ -58,10 +57,19 @@ form?.addEventListener("submit", async (event) => {
   }
 
   try {
+    const requestOptions = isNetlifyForm
+      ? {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(data).toString(),
+        }
+      : {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: data,
+        };
     const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: data,
+      ...requestOptions,
     });
     if (!response.ok) throw new Error("Submission failed");
     form.reset();

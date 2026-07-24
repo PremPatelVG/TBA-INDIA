@@ -86,10 +86,10 @@
           <a href="tel:+919586009183">+91 95860-09183</a>
         </div>
       </div>
-      <form class="contact-form grid grid-cols-1 gap-4 md:grid-cols-2" action="https://formsubmit.co/indiaops@tbaindia.in" method="POST" data-contact-form data-endpoint="https://formsubmit.co/ajax/indiaops@tbaindia.in">
-        <input type="hidden" name="_subject" value="New website enquiry - TBA India" />
-        <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_captcha" value="false" />
+      <form class="contact-form grid grid-cols-1 gap-4 md:grid-cols-2" name="contact" action="/contact-us.html" method="POST" data-netlify="true" netlify-honeypot="bot-field" data-contact-form data-endpoint="/">
+        <input type="hidden" name="form-name" value="contact" />
+        <input type="hidden" name="subject" value="New website enquiry - TBA India" />
+        <p class="hidden full-field" aria-hidden="true"><label>Do not fill this field<input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
         <label>First Name*<input name="first_name" type="text" autocomplete="given-name" required /></label>
         <label>Last Name*<input name="last_name" type="text" autocomplete="family-name" required /></label>
         <label>Email*<input name="email" type="email" autocomplete="email" required /></label>
