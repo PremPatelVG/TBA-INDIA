@@ -98,55 +98,63 @@
       </div>
       <div class="news-list">
         <!-- =====================================================================
-             HOW TO ADD A NEWS ITEM
-             Copy one <article class="news-card"> ... </article> block below and:
-               1. Set the date in <span class="news-date">.
-               2. (Optional) change the label in <span class="news-tag"> (e.g. Announcement,
-                  Event, Press, Milestone) or delete that span if not needed.
-               3. Write the news HEADING in the <h2>.
-               4. Write the DESCRIPTION (what this news is about) in the <p>.
-               5. IMAGE (optional): to show an image, keep the <div class="news-media">
-                  block and add "has-media" to the article class; to skip the image,
-                  remove the news-media block and the "has-media" class.
-             The newest item should go at the TOP of this list.
+             HOW TO ADD A NEWS ITEM  (newest goes at the TOP of this list)
+             Copy this template above the existing items and fill it in:
+
+             <article class="news-card has-media">
+               <div class="news-media">
+                 <img src="assets/images/your-image.webp" alt="…" loading="lazy" />
+               </div>
+               <div class="news-body">
+                 <div class="news-meta">
+                   <span class="news-date">DD Month YYYY</span>
+                   <span class="news-tag">Announcement</span>
+                 </div>
+                 <h2>Your news heading</h2>
+                 <p>Your description of what this news is about.</p>
+               </div>
+             </article>
+
+             • Full-width feature article: use class="news-card news-feature".
+             • Text-only card: remove the news-media block and the "has-media" class.
         ====================================================================== -->
 
-        <!-- SAMPLE ITEM 1 — with image (replace text + image) -->
-        <article class="news-card has-media">
+        <!-- FEATURED: Launch of TBA India -->
+        <article class="news-card news-feature">
           <div class="news-media">
-            <img src="assets/images/og-image.png" alt="TBA India news" loading="lazy" />
+            <img src="assets/images/news-tba-india-launch.webp" alt="Launch of TBA India — Ray Titus, CEO of United Franchise Group, with the TBA India leadership team at the launch event" loading="lazy" />
           </div>
           <div class="news-body">
             <div class="news-meta">
               <span class="news-date">01 September 2026</span>
               <span class="news-tag">Announcement</span>
             </div>
-            <h2>Sample headline — replace with your news title</h2>
-            <p>This is a sample description. Replace it with a short summary of what this news item is about — for example a new office opening, a partnership, an event, or a company milestone. Add as much or as little detail as you like.</p>
-          </div>
-        </article>
-
-        <!-- SAMPLE ITEM 2 — text only (no image) -->
-        <article class="news-card">
-          <div class="news-body">
-            <div class="news-meta">
-              <span class="news-date">20 August 2026</span>
-              <span class="news-tag">Event</span>
-            </div>
-            <h2>Another sample headline goes here</h2>
-            <p>A text-only news card, useful when you don't have an image. Use the heading to say what the news is, and this paragraph to describe the details.</p>
-          </div>
-        </article>
-
-        <!-- SAMPLE ITEM 3 — text only (no image) -->
-        <article class="news-card">
-          <div class="news-body">
-            <div class="news-meta">
-              <span class="news-date">05 August 2026</span>
-              <span class="news-tag">Press</span>
-            </div>
-            <h2>One more sample headline</h2>
-            <p>Duplicate this block for each new update. The most recent news should appear at the top of the list.</p>
+            <h2>Launch of TBA India</h2>
+            <p class="news-lede">India's new business transition economy: what happens after a business is built?</p>
+            <p class="news-standfirst">Indian entrepreneurs turn their focus from building companies to creating long-term enterprise value — entering a new era of business.</p>
+            <p><span class="news-place">1st September 2026 (New Delhi):</span> India's entrepreneurial story is gradually entering its next defining chapter — one that goes beyond starting and scaling businesses to answering a more complex question: what happens after the business is built?</p>
+            <p>As Indian enterprises mature, decisions around mergers and acquisitions (M&amp;A), succession, franchising, acquisitions, and business exits are becoming increasingly important. This shift is giving rise to what could become "India's Business Economy in Transition", where creating enterprise value becomes as important as creating enterprises.</p>
+            <p>Transworld Business Advisors (TBA), the world's largest business brokerage firm, launched in India with Ray Titus, CEO, United Franchise Group (UFG), gracing the event. It addresses the emerging opportunity in family, legacy and small business and brings expertise across business sales, acquisitions, M&amp;A, franchising, succession and wealth creation.</p>
+            <p>TBA is addressing India's $123.8 billion business deal market, targeting businesses with annual turnover of ₹5 crore to ₹200 crore+ and bringing them onto its platform to unlock meaningful deals and growth opportunities. Powered by its proprietary CRM technology, enhanced with AI and successfully deployed across global markets, the platform offers an end-to-end ecosystem connecting businesses, facilitating transactions and enabling growth.</p>
+            <blockquote class="news-quote">
+              <p>"The biggest threat to India's entrepreneurial story is not failure; it is businesses that succeed but remain dependent on their founders. If we want Indian companies to compete globally, we must stop measuring success only by revenue and start measuring it by how independently, sustainably and strategically a business can grow."</p>
+              <cite>Yash Vasant, Chairman, Transworld Business Advisors India (TBA India)</cite>
+            </blockquote>
+            <p>For decades, the dominant entrepreneurial ambition in India was straightforward: build a company, grow revenues and expand operations. But what happens after a business is built?</p>
+            <p>The emerging opportunity reflects a broader shift in entrepreneurial thinking. Instead of relying exclusively on organic expansion, entrepreneurs are increasingly asking: can acquisitions help us scale faster? How can we identify businesses that complement our existing operations? And how can established businesses unlock the wealth and value they have created?</p>
+            <p>The new generation of entrepreneurs is also increasingly asking different questions: how can I scale through acquisitions? How do I prepare my company for investment? How can I transition ownership to the next generation? And how do I unlock the value created over decades?</p>
+            <p>This changing approach could create a significant opportunity in India's MSME ecosystem, where established businesses may increasingly become potential targets for strategic acquisitions, investment and consolidation.</p>
+            <blockquote class="news-quote">
+              <p>"India does not have a shortage of entrepreneurs; it has a shortage of businesses built to become institutions. Our ambition with TBA India is to help change that equation by connecting credible businesses, capital, expertise and trusted relationships, so Indian companies don't just grow bigger, but become globally investable and acquisition-ready."</p>
+              <cite>Ray Titus, CEO, United Franchise Group (UFG)</cite>
+            </blockquote>
+            <blockquote class="news-quote">
+              <p>"India's next economic breakthrough will not come from creating more businesses; it will come from making existing businesses more valuable, transferable and globally relevant. Too many Indian entrepreneurs have built businesses around themselves rather than building enterprises that can outlive them. TBA India is here to change that mindset."</p>
+              <cite>Sanjiv Maini, President, TBA India</cite>
+            </blockquote>
+            <p>TBA's India entry comes against this changing backdrop, with the company seeking to help entrepreneurs navigate critical ownership and transition decisions.</p>
+            <p>The company believes India's maturing entrepreneurial ecosystem will increasingly require professional expertise around buying and selling businesses, M&amp;A, succession and strategic exits.</p>
+            <p>Other distinguished guests were also present on the occasion, and valuable interactions during the event enlightened the audience on the value that TBA India brings to Indian SMEs.</p>
           </div>
         </article>
       </div>
