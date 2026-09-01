@@ -797,3 +797,58 @@ h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 800; letter
   .nav-link, .btn, .service-card, .leader-card, .contact-card, .leader-photo, .brand-logo { transition: none; }
   .success-modal { animation: none; }
 }
+
+/* ============================================================
+   TBA NEWS
+   ============================================================ */
+.news-section { margin-inline: auto; max-width: 1000px; padding: var(--pad-y) var(--pad-x); }
+.news-intro { margin: 0 auto 2.4rem; max-width: 780px; text-align: center; }
+.news-list { display: grid; gap: 1.5rem; }
+.news-empty {
+  background: var(--white);
+  border: 1px dashed #c7d5c7;
+  border-radius: var(--r);
+  color: var(--muted);
+  padding: 2.4rem;
+  text-align: center;
+}
+.news-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  display: grid;
+  grid-template-columns: 1fr;
+  overflow: hidden;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+.news-card:hover { border-color: #cbdcca; box-shadow: var(--shadow); transform: translateY(-4px); }
+.news-media { background: var(--green-100); aspect-ratio: 16 / 9; overflow: hidden; }
+.news-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.news-body { padding: clamp(1.3rem, 3vw, 2rem); }
+.news-meta { align-items: center; display: flex; flex-wrap: wrap; gap: .7rem; margin-bottom: .8rem; }
+.news-date { color: var(--gold-600); font-size: .78rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.news-tag {
+  background: var(--green-100);
+  border-radius: var(--r-pill);
+  color: var(--green-950);
+  font-size: .7rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  padding: .25rem .75rem;
+  text-transform: uppercase;
+}
+.news-card h2 {
+  color: var(--green-950);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(1.35rem, 2.6vw, 1.95rem);
+  line-height: 1.15;
+  margin-bottom: .65rem;
+}
+.news-card p { color: var(--muted); line-height: 1.7; margin: 0; }
+.news-card .text-link { margin-top: 1rem; }
+
+@media (min-width: 768px) {
+  .news-card.has-media { grid-template-columns: minmax(0, 320px) 1fr; }
+  .news-card.has-media .news-media { aspect-ratio: auto; min-height: 100%; }
+}

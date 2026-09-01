@@ -51,7 +51,8 @@ if (siteHeader) {
     ".home-hero .hero-copy, .split-services .service-card, .metric-strip > div, " +
       ".feature-section > *, .section-heading, .service-grid > *, .cta-band > *, " +
       ".about-global-section > *, .about-history-copy > *, .about-detail-section > *, " +
-      ".leader-card, .contact-intro, .contact-form, .legal-section, .inner-hero > div"
+      ".leader-card, .contact-intro, .contact-form, .legal-section, .inner-hero > div, " +
+      ".news-intro, .news-list > *"
   );
   if (!targets.length) return;
 
@@ -62,7 +63,7 @@ if (siteHeader) {
   // Light stagger for items inside the same grid/row.
   document
     .querySelectorAll(
-      ".split-services, .metric-strip, .service-grid, .team-grid, .about-history-copy"
+      ".split-services, .metric-strip, .service-grid, .team-grid, .about-history-copy, .news-list"
     )
     .forEach((group) => {
       Array.prototype.slice.call(group.children, 0, 5).forEach((child, i) => {
