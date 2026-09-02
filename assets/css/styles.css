@@ -897,17 +897,6 @@ h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 800; letter
 @media (min-width: 640px)  { .team-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .team-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
-/* centre a card left alone on the final row */
-@media (min-width: 1024px) {
-  .team-grid > .leader-card:last-child:nth-child(3n + 1) { grid-column: 2; }
-}
-@media (min-width: 640px) and (max-width: 1023.98px) {
-  .team-grid > .leader-card:last-child:nth-child(2n + 1) {
-    grid-column: 1 / -1;
-    margin-inline: auto;
-    max-width: calc(50% - .8rem);
-  }
-}
 
 .leader-card {
   display: flex;
