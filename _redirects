@@ -1,0 +1,22 @@
+# Send the legacy .html URLs to clean paths (301 passes SEO value on)
+/index.html                 /                           301!
+/home.html                  /                           301!
+/home                       /                           301!
+/about-us.html              /about-us                   301!
+/our-leadership-team.html   /our-leadership-team        301!
+/tba-news.html              /tba-news                   301!
+/contact-us.html            /contact-us                 301!
+/terms-and-conditions.html  /terms-and-conditions       301!
+/privacy-policy.html        /privacy-policy             301!
+/ada.html                   /ada                        301!
+/user-agreement.html        /ada                        301!
+
+# Serve the clean paths from the underlying files (belt and braces —
+# Netlify does this natively, this guarantees it)
+/about-us                   /about-us.html              200
+/our-leadership-team        /our-leadership-team.html   200
+/tba-news                   /tba-news.html              200
+/contact-us                 /contact-us.html            200
+/terms-and-conditions       /terms-and-conditions.html  200
+/privacy-policy             /privacy-policy.html        200
+/ada                        /ada.html                   200

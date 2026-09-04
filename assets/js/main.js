@@ -48,10 +48,10 @@ if (siteHeader) {
 (function initReveal() {
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const targets = document.querySelectorAll(
-    ".home-hero .hero-copy, .split-services .service-card, .metric-strip > div, " +
+    ".split-services .service-card, .metric-strip > div, " +
       ".feature-section > *, .section-heading, .service-grid > *, .cta-band > *, " +
       ".about-global-section > *, .about-history-copy > *, .about-detail-section > *, " +
-      ".leader-card, .contact-intro, .contact-form, .legal-section, .inner-hero > div, " +
+      ".leader-card, .contact-intro, .contact-form, .legal-section, " +
       ".news-intro, .news-list > *"
   );
   if (!targets.length) return;
@@ -145,3 +145,39 @@ form?.addEventListener("submit", async (event) => {
     }
   }
 });
+
+/* ---- Animated count-up on the metric figures ------------- */
+(function initCounters() {
+  const figures = document.querySelectorAll(".metric-strip strong");
+  if (!figures.length) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!("IntersectionObserver" in window)) return;
+
+  const run = (el) => {
+    const match = /^(\d+)(.*)$/.exec(el.textContent.trim());
+    if (!match) return;
+    const target = parseInt(match[1], 10);
+    const suffix = match[2];
+    const duration = 1100;
+    const started = performance.now();
+
+    const step = (now) => {
+      const p = Math.min(1, (now - started) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);      // ease-out cubic
+      el.textContent = Math.round(target * eased) + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target + suffix;      // land exactly on the value
+    };
+    requestAnimationFrame(step);
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      observer.unobserve(entry.target);
+      run(entry.target);
+    });
+  }, { threshold: 0.4 });
+
+  figures.forEach((el) => observer.observe(el));
+})();

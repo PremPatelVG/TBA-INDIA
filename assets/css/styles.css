@@ -939,3 +939,121 @@ h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 800; letter
   margin: 0;
   padding-top: 1rem;
 }
+
+/* ============================================================
+   REFINEMENTS & MOTION
+   ============================================================ */
+:root {
+  --ease: cubic-bezier(.22, .7, .24, 1);
+  --ease-back: cubic-bezier(.2, .9, .3, 1.25);
+  --dur-fast: 160ms;
+  --dur: 280ms;
+  --dur-slow: 560ms;
+}
+
+/* ---- Mobile navigation: proper slide toggle ---------------- */
+.nav-menu { transform-origin: top center; will-change: transform, opacity; }
+
+@media (max-width: 767.98px) {
+  .nav-menu {
+    transform: translateY(-14px) scaleY(.96);
+    transition: opacity var(--dur) var(--ease),
+                transform var(--dur) var(--ease),
+                visibility 0s linear var(--dur);
+  }
+  .nav-menu.is-open {
+    transform: none;
+    transition: opacity var(--dur) var(--ease),
+                transform var(--dur) var(--ease-back),
+                visibility 0s;
+  }
+  /* links slide in one after another */
+  .nav-menu .nav-link {
+    opacity: 0;
+    transform: translateX(-14px);
+    transition: opacity 300ms var(--ease), transform 300ms var(--ease), background var(--dur-fast) ease;
+  }
+  .nav-menu.is-open .nav-link { opacity: 1; transform: none; }
+  .nav-menu.is-open .nav-link:nth-child(1) { transition-delay: 60ms; }
+  .nav-menu.is-open .nav-link:nth-child(2) { transition-delay: 95ms; }
+  .nav-menu.is-open .nav-link:nth-child(3) { transition-delay: 130ms; }
+  .nav-menu.is-open .nav-link:nth-child(4) { transition-delay: 165ms; }
+  .nav-menu.is-open .nav-link:nth-child(5) { transition-delay: 200ms; }
+  .nav-menu.is-open .nav-link:nth-child(6) { transition-delay: 235ms; }
+  .nav-menu.is-open .nav-link:nth-child(7) { transition-delay: 270ms; }
+  .nav-menu.is-open .nav-link:nth-child(8) { transition-delay: 305ms; }
+}
+
+/* ---- Desktop navigation: gold underline slides in ---------- */
+@media (min-width: 768px) {
+  .nav-link::after {
+    background: var(--gold);
+    border-radius: 2px;
+    bottom: .3rem;
+    content: "";
+    height: 2px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    transition: width 260ms var(--ease);
+    width: 0;
+  }
+  .nav-link:hover::after, .nav-link:focus-visible::after { width: calc(100% - 1.9rem); }
+  .nav-link.active::after { display: none; }
+}
+
+/* ---- Buttons: light sweep on hover ------------------------- */
+.btn { overflow: hidden; position: relative; }
+.btn > * { position: relative; z-index: 1; }
+.btn::after {
+  background: linear-gradient(115deg, transparent 34%, rgba(255, 255, 255, .3) 50%, transparent 66%);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateX(-130%);
+  transition: transform 700ms var(--ease);
+}
+.btn:hover::after, .btn:focus-visible::after { transform: translateX(130%); }
+
+/* ---- Cards: smoother lift with a gold edge ----------------- */
+.leader-card, .service-card.compact, .news-card, .contact-card {
+  transition: transform var(--dur) var(--ease),
+              box-shadow var(--dur) var(--ease),
+              border-color var(--dur) var(--ease);
+}
+.leader-card:hover, .news-card:hover { border-color: #cdd9c8; transform: translateY(-6px); }
+.leader-creds li { transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease; }
+.leader-card:hover .leader-creds li { background: var(--gold-100); border-color: #e4d3ac; }
+
+/* ---- Hero: staggered entrance ------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .home-hero .eyebrow,
+  .home-hero h1,
+  .home-hero .hero-lede,
+  .home-hero .hero-actions,
+  .inner-hero .eyebrow,
+  .inner-hero h1,
+  .inner-hero p:not(.eyebrow) { animation: hero-in 720ms var(--ease) both; }
+  .home-hero .eyebrow,  .inner-hero .eyebrow          { animation-delay: 60ms; }
+  .home-hero h1,        .inner-hero h1                { animation-delay: 150ms; }
+  .home-hero .hero-lede,.inner-hero p:not(.eyebrow)   { animation-delay: 280ms; }
+  .home-hero .hero-actions                            { animation-delay: 400ms; }
+}
+@keyframes hero-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---- Scroll reveal: softer, with a touch of scale ---------- */
+.reveal { transform: translateY(28px) scale(.985); transition: opacity var(--dur-slow) var(--ease), transform var(--dur-slow) var(--ease); }
+.reveal.in { transform: none; }
+
+/* ---- Metric figures ---------------------------------------- */
+.metric-strip strong { font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn::after { display: none; }
+  .nav-menu, .nav-menu .nav-link { transition: none !important; }
+  .nav-menu .nav-link { opacity: 1 !important; transform: none !important; }
+}
