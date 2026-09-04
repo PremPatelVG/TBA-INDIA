@@ -108,41 +108,67 @@ document.addEventListener("keydown", (event) => {
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   errorMessage?.classList.add("hidden");
-  const endpoint = form.getAttribute("data-endpoint") || form.action;
+
   const data = new FormData(form);
-  const isNetlifyForm = form.hasAttribute("data-netlify");
-  if (isNetlifyForm && form.name) data.set("form-name", form.name);
+  const sheetEndpoint = form.getAttribute("data-sheet-endpoint") || "";
+  const sheetToken = form.getAttribute("data-sheet-token") || "";
+  const sheetReady = sheetEndpoint && !sheetEndpoint.startsWith("PASTE_");
 
   if (submitButton) {
     submitButton.disabled = true;
     submitButton.textContent = "Sending...";
   }
 
-  try {
-    const requestOptions = isNetlifyForm
-      ? {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams(data).toString(),
-        }
-      : {
-          method: "POST",
-          headers: { Accept: "application/json" },
-          body: data,
-        };
-    const response = await fetch(endpoint, {
-      ...requestOptions,
-    });
-    if (!response.ok) throw new Error("Submission failed");
+  let delivered = false;
+
+  // 1) Primary: Google Sheet via Apps Script. Sent as text/plain so the
+  //    browser issues a simple request and skips the CORS preflight.
+  if (sheetReady) {
+    const payload = Object.fromEntries(data.entries());
+    payload.token = sheetToken;
+    payload.page = window.location.pathname;
+    try {
+      const response = await fetch(sheetEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const result = await response.json().catch(() => ({ ok: true }));
+        delivered = result.ok !== false;
+      }
+    } catch {
+      delivered = false;
+    }
+  }
+
+  // 2) Fallback: Netlify Forms, so an enquiry is never lost if the
+  //    Apps Script endpoint is unreachable.
+  if (!delivered && form.hasAttribute("data-netlify")) {
+    const netlifyData = new FormData(form);
+    if (form.name) netlifyData.set("form-name", form.name);
+    try {
+      const response = await fetch(form.getAttribute("data-endpoint") || "/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(netlifyData).toString(),
+      });
+      delivered = response.ok;
+    } catch {
+      delivered = false;
+    }
+  }
+
+  if (delivered) {
     form.reset();
     modal?.classList.remove("hidden");
-  } catch {
+  } else {
     errorMessage?.classList.remove("hidden");
-  } finally {
-    if (submitButton) {
-      submitButton.disabled = false;
-      submitButton.textContent = "Submit Enquiry";
-    }
+  }
+
+  if (submitButton) {
+    submitButton.disabled = false;
+    submitButton.textContent = "Submit Enquiry";
   }
 });
 
