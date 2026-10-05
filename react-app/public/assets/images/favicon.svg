@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TBA India">
+  <rect width="64" height="64" rx="14" fill="#013f22"/>
+  <rect x="4" y="4" width="56" height="56" rx="11" fill="none" stroke="#b99752" stroke-width="2" opacity="0.55"/>
+  <path d="M17 22h30v6.4H35.6V47h-7.2V28.4H17V22Z" fill="#b99752"/>
+  <circle cx="32" cy="52" r="2.4" fill="#b99752"/>
+</svg>

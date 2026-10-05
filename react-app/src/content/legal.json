@@ -1,0 +1,26 @@
+{
+  "privacy": {
+    "path": "/privacy-policy",
+    "eyebrow": "Privacy Policy",
+    "h1": "Privacy Policy",
+    "intro": "This policy explains how personal data may be collected, used, retained, disclosed, and protected.",
+    "title": "Privacy Policy | TBA India",
+    "description": "This policy explains how personal data may be collected, used, retained, disclosed, and protected."
+  },
+  "terms": {
+    "path": "/terms-and-conditions",
+    "eyebrow": "Terms &amp; Conditions",
+    "h1": "GDPR",
+    "intro": "This page explains GDPR and how it relates to privacy, processing, monitoring, and personal data protection.",
+    "title": "GDPR | TBA India",
+    "description": "This page explains GDPR and how it relates to privacy, processing, monitoring, and personal data protection."
+  },
+  "ada": {
+    "path": "/ada",
+    "eyebrow": "ADA",
+    "h1": "ADA Notice",
+    "intro": "This notice explains our commitment to website accessibility and ongoing accessibility review.",
+    "title": "ADA Notice | TBA India",
+    "description": "This notice explains our commitment to website accessibility and ongoing accessibility review."
+  }
+}
