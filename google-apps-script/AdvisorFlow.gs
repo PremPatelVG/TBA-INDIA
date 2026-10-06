@@ -1,6 +1,10 @@
 /**
  * TBA India — "Become an Advisor" application + approval flow
  * ===========================================================
+ * NOTE: This is the Google / Gmail version. If indiaops@tbaindia.in is on
+ * Microsoft 365 / Outlook, DO NOT use this file — follow
+ * ../outlook-power-automate/README.md instead.
+ *
  * A separate Apps Script from the contact-form one. It:
  *   1. Receives advisor applications from the website form.
  *   2. Logs each to an "Advisor Applications" sheet (status: Pending).
