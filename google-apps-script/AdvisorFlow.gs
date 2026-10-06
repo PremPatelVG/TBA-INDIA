@@ -14,6 +14,18 @@
  * No SMTP needed — Google sends the mail.
  *
  * ───────────────────────────────────────────────────────────────────────
+ *  EVERYTHING RUNS THROUGH indiaops@tbaindia.in
+ *  ---------------------------------------------
+ *  Google Apps Script always sends email FROM the account that owns the
+ *  script, and the reply-scanner reads THAT SAME account's mailbox. So this
+ *  script MUST be created while signed in as  indiaops@tbaindia.in.  Then:
+ *    • Sanjiv receives the application email FROM indiaops@tbaindia.in.
+ *    • His "yes" reply comes back INTO the indiaops inbox (where the
+ *      scanner can see it).
+ *    • The applicant's welcome email (with the 2 files) is sent FROM
+ *      indiaops@tbaindia.in.
+ *    • A confirmation of the outcome is sent to indiaops and cc'd to Sanjiv.
+ *
  *  BEFORE IT WORKS, FILL IN THE 3 THINGS MARKED  << >>  BELOW:
  *    1. APPROVER_EMAIL  — Sanjiv's email address.
  *    2. FILE_ID_1 / FILE_ID_2 — the Drive file IDs of the 2 files to send.
@@ -21,23 +33,21 @@
  *          link OR keep private; copy the ID from the URL:
  *          https://drive.google.com/file/d/<<THIS IS THE ID>>/view )
  *
- *  SETUP
- *    1. Create a Google Sheet (or reuse one). Extensions > Apps Script.
+ *  SETUP  (do all of this while signed in as indiaops@tbaindia.in)
+ *    1. Sign in to Google as indiaops@tbaindia.in. Create a Google Sheet
+ *       (or reuse one you own). Extensions > Apps Script.
  *    2. Paste this file. Save.
  *    3. Run the function `installApprovalReplyScanner` once (toolbar > Run)
- *       and authorise — this installs the background check that watches for
- *       Sanjiv's "yes" replies every 5 minutes.
+ *       and authorise — this installs the background check that watches the
+ *       indiaops inbox for Sanjiv's "yes" replies every 5 minutes.
  *    4. Deploy > New deployment > Web app:
- *         Execute as:     Me
+ *         Execute as:     Me (indiaops@tbaindia.in)
  *         Who has access: Anyone
  *       Copy the /exec URL — that's what the website form posts to.
  *
- *  IMPORTANT for the reply-"yes" method: Sanjiv's reply must land in the
- *  mailbox of the Google account that OWNS this script. The approval email
- *  sets Reply-To to this account, so a normal reply comes back here. The
- *  simplest robust setup is to own this script under a tbaindia.in Workspace
- *  account that your team monitors (e.g. indiaops@tbaindia.in). The one-click
- *  Approve button works regardless of mailboxes.
+ *  The one-click Approve / Reject buttons work regardless of which mailbox
+ *  Sanjiv reads from; only the reply-"yes" shortcut needs his reply to land
+ *  back in the indiaops inbox, which the setup above guarantees.
  */
 
 // ============================ CONFIG ============================
@@ -46,7 +56,9 @@ const FILE_ID_1      = '<< GOOGLE_DRIVE_FILE_ID_1 >>';
 const FILE_ID_2      = '<< GOOGLE_DRIVE_FILE_ID_2 >>';
 
 const BRAND_NAME  = 'TBA India';
-const TEAM_EMAIL  = 'indiaops@tbaindia.in';   // shown to applicants for queries
+// The hub mailbox. THIS SCRIPT MUST BE OWNED BY THIS ACCOUNT: every email is
+// sent from it, and Sanjiv's replies return to it for the scanner to read.
+const TEAM_EMAIL  = 'indiaops@tbaindia.in';
 const PHONE       = '+91 95860-09183';
 const SHEET_NAME  = 'Advisor Applications';
 const TOKEN       = 'tba-advisor-2026';        // guards the approve/reject links
@@ -152,7 +164,10 @@ function decide_(appId, decision, via) {
       first_name: values[r][COL.first - 1], last_name: values[r][COL.last - 1],
       email: values[r][COL.email - 1],
     };
-    if (decision === 'Approved') sendApplicantApproval_(applicant);
+    if (decision === 'Approved') {
+      sendApplicantApproval_(applicant);
+      notifyTeamApproved_(appId, applicant, via);
+    }
     return {
       title: decision === 'Approved' ? 'Approved ✓' : 'Rejected',
       message: decision === 'Approved'
@@ -189,12 +204,28 @@ function notifyApprover_(appId, d) {
 
   MailApp.sendEmail({
     to: APPROVER_EMAIL,
-    replyTo: Session.getActiveUser().getEmail() || TEAM_EMAIL,   // replies return to this script's mailbox
+    replyTo: TEAM_EMAIL,   // Sanjiv's reply returns to indiaops, where the scanner reads it
     subject: 'Advisor application from ' + (fullName || 'applicant') + ' [' + appId + ']',
     name: BRAND_NAME + ' Applications',
     htmlBody: html,
     body: 'New advisor application ' + appId + ' from ' + fullName + ' (' + d.email + ').\n' +
           'Reply "yes" to approve, or open the email in HTML to use the buttons.',
+  });
+}
+
+/** After approval, confirm the outcome to indiaops and cc Sanjiv. */
+function notifyTeamApproved_(appId, a, via) {
+  const name = ((a.first_name || '') + ' ' + (a.last_name || '')).trim();
+  MailApp.sendEmail({
+    to: TEAM_EMAIL,
+    cc: APPROVER_EMAIL,
+    name: BRAND_NAME + ' Applications',
+    subject: 'Approved & sent — advisor ' + (name || a.email) + ' [' + appId + ']',
+    body: 'Application ' + appId + ' from ' + (name || a.email) + ' (' + a.email + ') ' +
+      'has been approved (via ' + via + ').\n\n' +
+      'The applicant has just been emailed the welcome message with both ' +
+      'onboarding files attached. No further action is needed.\n\n' +
+      '— ' + BRAND_NAME + ' advisor flow',
   });
 }
 
