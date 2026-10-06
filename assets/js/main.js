@@ -86,12 +86,12 @@ if (siteHeader) {
   targets.forEach((el) => observer.observe(el));
 })();
 
-/* ---- Contact form (Netlify Forms) ---------------------- */
-const form = document.querySelector("[data-contact-form]");
+/* ---- Website forms (contact + advisor application) ------ */
+/*  Works for every [data-contact-form] on the page. Each form carries its
+    own Apps Script endpoint (data-sheet-endpoint), submit button and error
+    line; the page's one success modal is shared.                           */
 const modal = document.querySelector("[data-success-modal]");
 const closeModal = document.querySelector("[data-close-modal]");
-const errorMessage = document.querySelector("[data-form-error]");
-const submitButton = document.querySelector("[data-submit-button]");
 
 function hideModal() {
   modal?.classList.add("hidden");
@@ -105,71 +105,77 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") hideModal();
 });
 
-form?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  errorMessage?.classList.add("hidden");
+document.querySelectorAll("[data-contact-form]").forEach((form) => {
+  const errorMessage = form.querySelector("[data-form-error]");
+  const submitButton = form.querySelector("[data-submit-button]");
+  const originalLabel = submitButton ? submitButton.textContent : "Submit";
 
-  const data = new FormData(form);
-  const sheetEndpoint = form.getAttribute("data-sheet-endpoint") || "";
-  const sheetToken = form.getAttribute("data-sheet-token") || "";
-  const sheetReady = sheetEndpoint && !sheetEndpoint.startsWith("PASTE_");
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    errorMessage?.classList.add("hidden");
 
-  if (submitButton) {
-    submitButton.disabled = true;
-    submitButton.textContent = "Sending...";
-  }
+    const data = new FormData(form);
+    const sheetEndpoint = form.getAttribute("data-sheet-endpoint") || "";
+    const sheetToken = form.getAttribute("data-sheet-token") || "";
+    const sheetReady = sheetEndpoint && !sheetEndpoint.startsWith("PASTE_");
 
-  let delivered = false;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Sending...";
+    }
 
-  // 1) Primary: Google Sheet via Apps Script. Sent as text/plain so the
-  //    browser issues a simple request and skips the CORS preflight.
-  if (sheetReady) {
-    const payload = Object.fromEntries(data.entries());
-    payload.token = sheetToken;
-    payload.page = window.location.pathname;
-    try {
-      const response = await fetch(sheetEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
-        const result = await response.json().catch(() => ({ ok: true }));
-        delivered = result.ok !== false;
+    let delivered = false;
+
+    // 1) Primary: Google Sheet via Apps Script. Sent as text/plain so the
+    //    browser issues a simple request and skips the CORS preflight.
+    if (sheetReady) {
+      const payload = Object.fromEntries(data.entries());
+      payload.token = sheetToken;
+      payload.page = window.location.pathname;
+      try {
+        const response = await fetch(sheetEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload),
+        });
+        if (response.ok) {
+          const result = await response.json().catch(() => ({ ok: true }));
+          delivered = result.ok !== false;
+        }
+      } catch {
+        delivered = false;
       }
-    } catch {
-      delivered = false;
     }
-  }
 
-  // 2) Fallback: Netlify Forms, so an enquiry is never lost if the
-  //    Apps Script endpoint is unreachable.
-  if (!delivered && form.hasAttribute("data-netlify")) {
-    const netlifyData = new FormData(form);
-    if (form.name) netlifyData.set("form-name", form.name);
-    try {
-      const response = await fetch(form.getAttribute("data-endpoint") || "/", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams(netlifyData).toString(),
-      });
-      delivered = response.ok;
-    } catch {
-      delivered = false;
+    // 2) Fallback: Netlify Forms, so a submission is never lost if the
+    //    Apps Script endpoint is unreachable.
+    if (!delivered && form.hasAttribute("data-netlify")) {
+      const netlifyData = new FormData(form);
+      if (form.name) netlifyData.set("form-name", form.name);
+      try {
+        const response = await fetch(form.getAttribute("data-endpoint") || "/", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(netlifyData).toString(),
+        });
+        delivered = response.ok;
+      } catch {
+        delivered = false;
+      }
     }
-  }
 
-  if (delivered) {
-    form.reset();
-    modal?.classList.remove("hidden");
-  } else {
-    errorMessage?.classList.remove("hidden");
-  }
+    if (delivered) {
+      form.reset();
+      modal?.classList.remove("hidden");
+    } else {
+      errorMessage?.classList.remove("hidden");
+    }
 
-  if (submitButton) {
-    submitButton.disabled = false;
-    submitButton.textContent = "Submit Enquiry";
-  }
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent = originalLabel;
+    }
+  });
 });
 
 /* ---- Animated count-up on the metric figures ------------- */

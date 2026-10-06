@@ -603,6 +603,19 @@ h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 800; letter
 .contact-card { display: grid; gap: .35rem; margin-top: 2rem; }
 .contact-card a { color: var(--green-900); font-weight: 800; }
 .contact-card a:hover { color: var(--gold-600); }
+.advisor-steps {
+  color: var(--muted);
+  display: grid;
+  gap: .55rem;
+  line-height: 1.6;
+  margin: .4rem 0 .2rem;
+  padding-left: 1.2rem;
+}
+.advisor-steps li { padding-left: .15rem; }
+.advisor-steps li::marker { color: var(--green-900); font-weight: 800; }
+.advisor-note { color: var(--muted); font-size: .9rem; margin-top: .7rem; }
+.advisor-note a { color: var(--green-900); font-weight: 800; }
+.advisor-note a:hover { color: var(--gold-600); }
 .contact-form {
   background: var(--white);
   border: 1px solid var(--line);
