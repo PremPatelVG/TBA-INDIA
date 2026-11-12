@@ -9,9 +9,10 @@
    see the new one).
    ------------------------------------------------------------ */
 const LATEST_NEWS = {
-  id: "launch-of-tba-india",
-  label: "Latest news",
-  title: "Launch of TBA India",
+  id: "press-coverage-sep-2026",
+  label: "In the news",
+  title: "Featured in The Economic Times & 6 more",
+  cta: "See the coverage",
   image: "assets/images/news-tba-india-launch.webp",
   href: "tba-news.html#latest",
 };
@@ -218,7 +219,7 @@ const ICON_CLOSE =
       '<span class="news-pop__text">' +
         '<span class="news-pop__label"><span class="pulse" aria-hidden="true"></span>' + LATEST_NEWS.label + "</span>" +
         '<span class="news-pop__title">' + LATEST_NEWS.title + "</span>" +
-        '<span class="news-pop__cta">Read the story ' + ICON_ARROW + "</span>" +
+        '<span class="news-pop__cta">' + (LATEST_NEWS.cta || "Read the story") + " " + ICON_ARROW + "</span>" +
       "</span>" +
     "</a>" +
     '<button class="news-pop__close" type="button" aria-label="Dismiss latest news">' + ICON_CLOSE + "</button>";
