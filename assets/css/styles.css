@@ -616,6 +616,33 @@ h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: 800; letter
 .advisor-note { color: var(--muted); font-size: .9rem; margin-top: .7rem; }
 .advisor-note a { color: var(--green-900); font-weight: 800; }
 .advisor-note a:hover { color: var(--gold-600); }
+.advisor-embed {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.advisor-embed iframe {
+  border: 0;
+  display: block;
+  height: 820px;
+  max-height: 86vh;
+  width: 100%;
+}
+.advisor-embed-fallback {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .85rem;
+  margin: 0;
+  padding: .8rem 1rem;
+  text-align: center;
+}
+.advisor-embed-fallback a { color: var(--green-900); font-weight: 800; }
+.advisor-embed-fallback a:hover { color: var(--gold-600); }
+@media (max-width: 640px) {
+  .advisor-embed iframe { height: 88vh; }
+}
 .contact-form {
   background: var(--white);
   border: 1px solid var(--line);

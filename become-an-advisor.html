@@ -130,31 +130,13 @@
           <p class="advisor-note">Questions? <a href="mailto:indiaops@tbaindia.in">indiaops@tbaindia.in</a> &middot; <a href="tel:+919586009183">+91 95860-09183</a></p>
         </div>
       </div>
-      <form class="contact-form grid grid-cols-1 gap-4 md:grid-cols-2" name="advisor" action="become-an-advisor.html" method="POST"
-            data-contact-form data-endpoint="/"
-            data-sheet-endpoint="PASTE_ADVISOR_EXEC_URL_HERE"
-            data-sheet-token="">
-        <input type="hidden" name="form-name" value="advisor" />
-        <input type="hidden" name="subject" value="New advisor application - TBA India" />
-        <p class="hidden full-field" aria-hidden="true"><label>Do not fill this field<input name="bot-field" tabindex="-1" autocomplete="off" /></label></p>
-        <label>First Name*<input name="first_name" type="text" autocomplete="given-name" required /></label>
-        <label>Last Name*<input name="last_name" type="text" autocomplete="family-name" required /></label>
-        <label>Email*<input name="email" type="email" autocomplete="email" required /></label>
-        <label>Phone*<input name="phone" type="tel" autocomplete="tel" required /></label>
-        <label>City<input name="city" type="text" autocomplete="address-level2" /></label>
-        <label>Professional Background<input name="background" type="text" placeholder="e.g. CA, ex-banker, entrepreneur" /></label>
-        <label class="full-field">Why do you want to join TBA India as an advisor?*<textarea name="message" rows="5" required></textarea></label>
-        <button class="btn btn-primary full-field" type="submit" data-submit-button>Submit Application</button>
-        <p class="form-error hidden full-field" data-form-error>We could not send your application automatically. Please email indiaops@tbaindia.in directly.</p>
-      </form>
-    </section>
-    <div class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="success-title" data-success-modal>
-      <div class="success-modal">
-        <h2 id="success-title">Application received</h2>
-        <p>Thank you for applying to join TBA India. Our team will review your application and email you with the next steps.</p>
-        <button class="btn btn-primary" type="button" data-close-modal>Close</button>
+      <div class="advisor-embed">
+        <iframe title="Become a TBA India Advisor — application form"
+                src="https://forms.cloud.microsoft/r/2byyQGbyd5?embed=true"
+                loading="lazy" allow="fullscreen"></iframe>
+        <p class="advisor-embed-fallback">Form not loading? <a href="https://forms.cloud.microsoft/r/2byyQGbyd5" target="_blank" rel="noopener">Open the application form in a new tab &rarr;</a></p>
       </div>
-    </div>
+    </section>
       </main>
 
     <footer class="site-footer">
