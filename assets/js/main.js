@@ -290,6 +290,15 @@ document.querySelectorAll("[data-contact-form]").forEach((form) => {
       const payload = Object.fromEntries(data.entries());
       payload.token = sheetToken;
       payload.page = window.location.pathname;
+      // Forms with extra fields also send them as one readable "message", so a
+      // handler that only stores the standard columns still keeps every answer.
+      if (form.hasAttribute("data-summary")) {
+        const standard = ["form", "interest", "bot-field", "first_name", "last_name", "email", "phone"];
+        payload.message = Array.from(form.querySelectorAll(".field [name]"))
+          .filter((el) => !standard.includes(el.name) && el.value.trim())
+          .map((el) => el.closest(".field").querySelector("span").textContent.replace("*", "").trim() + ": " + el.value.trim())
+          .join("\n");
+      }
       try {
         const response = await fetch(sheetEndpoint, {
           method: "POST",
