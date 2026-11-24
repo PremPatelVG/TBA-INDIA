@@ -296,7 +296,7 @@ document.querySelectorAll("[data-contact-form]").forEach((form) => {
         const standard = ["form", "interest", "bot-field", "first_name", "last_name", "email", "phone"];
         payload.message = Array.from(form.querySelectorAll(".field [name]"))
           .filter((el) => !standard.includes(el.name) && el.value.trim())
-          .map((el) => el.closest(".field").querySelector("span").textContent.replace("*", "").trim() + ": " + el.value.trim())
+          .map((el) => (el.dataset.label || el.closest(".field").querySelector("span").textContent.replace("*", "").trim()) + ": " + el.value.trim())
           .join("\n");
       }
       try {

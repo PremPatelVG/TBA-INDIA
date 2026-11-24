@@ -68,8 +68,8 @@ function doPost(e) {
     }
     if (d['bot-field']) return json({ ok: true });   // honeypot: drop bots
 
-    // The hidden dashboard-access-request.html page has its own sheet + emails.
-    if (d.form === 'dashboard-access') return handleDashboardAccess_(d);
+    // The hidden training registration page has its own sheet + emails.
+    if (d.form === 'training-registration') return handleTrainingRegistration_(d);
 
     getSheet().appendRow([
       new Date(),
@@ -181,60 +181,68 @@ function sendAutoReply_(d, firstName) {
   });
 }
 
-/* ---------- Dashboard access requests (hidden page) ---------- */
-const ACCESS_SHEET_NAME = 'Dashboard Access Requests';
-const ACCESS_HEADERS = ['Timestamp', 'First Name', 'Last Name', 'Email', 'Phone',
-                        'Organisation', 'Role', 'Access Needed', 'Invited By',
-                        'Reason', 'Status'];
+/* ---------- TBA training class registrations (hidden page) ---------- */
+/*  Posted by dashboard-access-request.html, which is not linked anywhere
+    on the site; it is shared by direct link only.                          */
+const TRAINING_SHEET_NAME = 'Training Class Registrations';
+const TRAINING_HEADERS = ['Timestamp', 'Franchisee First Name', 'Franchisee Last Name',
+                          'TBA Office', 'Agent First Name', 'Agent Last Name',
+                          'Agent Email', 'Agent Phone', 'Training Month', 'Status'];
 
-function handleDashboardAccess_(d) {
+function handleTrainingRegistration_(d) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName(ACCESS_SHEET_NAME) || ss.insertSheet(ACCESS_SHEET_NAME);
+  const sheet = ss.getSheetByName(TRAINING_SHEET_NAME) || ss.insertSheet(TRAINING_SHEET_NAME);
   if (sheet.getLastRow() === 0) {
-    sheet.appendRow(ACCESS_HEADERS);
-    sheet.getRange(1, 1, 1, ACCESS_HEADERS.length).setFontWeight('bold');
+    sheet.appendRow(TRAINING_HEADERS);
+    sheet.getRange(1, 1, 1, TRAINING_HEADERS.length).setFontWeight('bold');
     sheet.setFrozenRows(1);
   }
   sheet.appendRow([
-    new Date(), d.first_name || '', d.last_name || '', d.email || '', d.phone || '',
-    d.organisation || '', d.role || '', d.access_type || '', d.referred_by || '',
-    d.reason || '', 'Pending'
+    new Date(),
+    d.franchisee_first_name || '', d.franchisee_last_name || '', d.office_name || '',
+    d.first_name || '', d.last_name || '', d.email || '', d.phone || '',
+    d.training_month || '', 'Received'
   ]);
 
-  const fullName = ((d.first_name || '') + ' ' + (d.last_name || '')).trim();
+  const agent = ((d.first_name || '') + ' ' + (d.last_name || '')).trim();
+  const franchisee = ((d.franchisee_first_name || '') + ' ' + (d.franchisee_last_name || '')).trim();
+  const month = d.training_month || 'TBD';
 
   // 1) Notify the team
   MailApp.sendEmail({
     to: NOTIFY_EMAIL,
     replyTo: d.email || NOTIFY_EMAIL,
-    subject: 'Dashboard access request - ' + (fullName || 'new request') +
-             (d.organisation ? ' (' + d.organisation + ')' : ''),
+    subject: 'Training class registration - ' + (agent || 'new agent') +
+             (d.office_name ? ' (' + d.office_name + ')' : '') + ' - ' + month,
     name: BRAND_NAME + ' Website',
     body: [
-      'A new dashboard access request has come in.', '',
-      'Name:          ' + (fullName           || '-'),
-      'Email:         ' + (d.email            || '-'),
-      'Phone:         ' + (d.phone            || '-'),
-      'Organisation:  ' + (d.organisation     || '-'),
-      'Role:          ' + (d.role             || '-'),
-      'Access needed: ' + (d.access_type      || '-'),
-      'Invited by:    ' + (d.referred_by      || '-'), '',
-      'Reason:', (d.reason || '-'), '',
-      '---', 'Logged in the "' + ACCESS_SHEET_NAME + '" sheet with status Pending.'
+      'A new TBA training class registration has come in.', '',
+      'Franchisee:      ' + (franchisee     || '-'),
+      'TBA office:      ' + (d.office_name  || '-'), '',
+      'Agent:           ' + (agent          || '-'),
+      'Agent email:     ' + (d.email        || '-'),
+      'Agent phone:     ' + (d.phone        || '-'), '',
+      'Training month:  ' + month, '',
+      '---', 'Logged in the "' + TRAINING_SHEET_NAME + '" sheet.'
     ].join('\n')
   });
 
-  // 2) Confirm to the requester
+  // 2) Confirm to the agent
   if (isEmail_(d.email)) {
     MailApp.sendEmail({
       to: d.email,
       replyTo: NOTIFY_EMAIL,
-      subject: 'We’ve received your dashboard access request — ' + BRAND_NAME,
+      subject: 'Your TBA training class registration — ' + BRAND_NAME,
       name: BRAND_NAME,
       body: [
         (d.first_name ? 'Dear ' + d.first_name + ',' : 'Hello,'), '',
-        'Thank you for requesting access to the ' + BRAND_NAME + ' dashboard. Our team will review your request and email you once your access is set up.', '',
-        'Access requested: ' + (d.access_type || '-'), '',
+        'You have been registered for a TBA training class' +
+          (d.office_name ? ' by ' + d.office_name : '') + '.', '',
+        'Month: ' + month, '',
+        month === 'TBD'
+          ? 'Our team will be in touch to schedule your training class.'
+          : 'Our team will email you the class dates and details closer to the time.',
+        '',
         'If you have any questions, reply to this email or write to ' + NOTIFY_EMAIL + '.', '',
         'Warm regards,', 'The ' + BRAND_NAME + ' Team'
       ].join('\n')

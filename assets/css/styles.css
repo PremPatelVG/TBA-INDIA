@@ -1415,3 +1415,21 @@ a.info-item:hover { border-color: var(--line-2); box-shadow: var(--shadow-md); }
 
 /* the pop-up title may wrap to two lines */
 .news-pop__title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; }
+
+/* ---------- 25. Grouped forms -------------------------------- */
+.form-stack { display: grid; gap: 1.75rem; }
+.field-group { border: 0; margin: 0; min-width: 0; padding: 0; }
+.field-group + .field-group { border-top: 1px solid var(--line); padding-top: 1.5rem; }
+.field-group legend {
+  color: var(--gold-700);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: .14em;
+  margin-bottom: 1rem;
+  padding: 0;
+  text-transform: uppercase;
+}
+.form-stack .form-error, .form-stack .form-foot { grid-column: auto; }
+/* keep the section label below the divider, not inside it */
+.field-group legend { float: left; width: 100%; }
+.field-group legend + * { clear: both; }
