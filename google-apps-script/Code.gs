@@ -12,10 +12,10 @@
  *    3. Sends the person who submitted an automatic confirmation reply
  *       with the next steps (the "auto-response").
  *
- *  No SMTP server is required — Google sends these emails for you. They are
- *  sent FROM the Google account that owns this script, so for a professional
- *  "from" address, create/own this script under indiaops@tbaindia.in (or any
- *  tbaindia.in Google Workspace account).
+ *  SENDING: emails go out FROM indiaops@tbaindia.in through Microsoft 365
+ *  once the Microsoft login details are saved in Script Properties (see
+ *  MICROSOFT-365-EMAIL.md next to this file). Until then they are sent by
+ *  Google from the account that owns this script, so nothing is lost.
  *
  *  SETUP
  *  1. Create a Google Sheet (any name you like).
@@ -80,7 +80,7 @@ function doPost(e) {
     const fullName = ((d.first_name || '') + ' ' + (d.last_name || '')).trim();
 
     // 1) Notify the team
-    MailApp.sendEmail({
+    sendMail_({
       to: NOTIFY_EMAIL,
       replyTo: d.email || NOTIFY_EMAIL,
       subject: 'New website enquiry - ' + BRAND_NAME + (fullName ? ' (' + fullName + ')' : ''),
@@ -171,7 +171,7 @@ function sendAutoReply_(d, firstName) {
     '<p style="max-width:560px;margin:14px auto 0;font-size:11px;line-height:1.5;color:#9aa49d;text-align:center;">This is an automated confirmation of the enquiry you submitted on our website. If you did not submit this, please ignore this email.</p>' +
   '</div>';
 
-  MailApp.sendEmail({
+  sendMail_({
     to: d.email,
     replyTo: NOTIFY_EMAIL,
     subject: 'We’ve received your enquiry — ' + BRAND_NAME,
@@ -209,7 +209,7 @@ function handleTrainingRegistration_(d) {
   const month = d.training_month || 'TBD';
 
   // 1) Notify the team
-  MailApp.sendEmail({
+  sendMail_({
     to: NOTIFY_EMAIL,
     replyTo: d.email || NOTIFY_EMAIL,
     subject: 'Training class registration - ' + (agent || 'new agent') +
@@ -229,7 +229,7 @@ function handleTrainingRegistration_(d) {
 
   // 2) Confirm to the agent
   if (isEmail_(d.email)) {
-    MailApp.sendEmail({
+    sendMail_({
       to: d.email,
       replyTo: NOTIFY_EMAIL,
       subject: 'Your TBA training class registration — ' + BRAND_NAME,
@@ -250,6 +250,108 @@ function handleTrainingRegistration_(d) {
   }
 
   return json({ ok: true });
+}
+
+/* ---------- Sending email through Microsoft 365 ---------- */
+/*  Every email above goes through sendMail_(). When the Microsoft 365 login
+    details are saved in Script Properties, it sends through Microsoft Graph
+    (Microsoft's email API, the replacement for password-based SMTP) so mail
+    really comes FROM the Microsoft 365 mailbox and lands in its Sent folder.
+    Until then, or if Microsoft refuses a send, it falls back to Google's
+    MailApp so no email is ever lost.
+
+    Script Properties (Project Settings > Script Properties). These are
+    secrets: keep them there, never in this file.
+      MS_TENANT_ID      Directory (tenant) ID of your Microsoft 365
+      MS_CLIENT_ID      Application (client) ID of the app registration
+      MS_CLIENT_SECRET  Client secret VALUE of that app registration
+      MS_SENDER         Mailbox to send from (optional; default NOTIFY_EMAIL)
+
+    After saving them, run testMicrosoftMail() once from the toolbar.      */
+
+function msConfig_() {
+  const props = PropertiesService.getScriptProperties();
+  const cfg = {
+    tenant: props.getProperty('MS_TENANT_ID'),
+    client: props.getProperty('MS_CLIENT_ID'),
+    secret: props.getProperty('MS_CLIENT_SECRET'),
+    sender: props.getProperty('MS_SENDER') || NOTIFY_EMAIL
+  };
+  return (cfg.tenant && cfg.client && cfg.secret) ? cfg : null;
+}
+
+/** App-only access token for Microsoft Graph, cached for 50 minutes. */
+function msToken_(cfg) {
+  const cache = CacheService.getScriptCache();
+  const cached = cache.get('ms_graph_token');
+  if (cached) return cached;
+  const res = UrlFetchApp.fetch(
+    'https://login.microsoftonline.com/' + encodeURIComponent(cfg.tenant) + '/oauth2/v2.0/token', {
+      method: 'post',
+      payload: {
+        client_id: cfg.client,
+        client_secret: cfg.secret,
+        scope: 'https://graph.microsoft.com/.default',
+        grant_type: 'client_credentials'
+      },
+      muteHttpExceptions: true
+    });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('Microsoft sign-in failed (' + res.getResponseCode() + '): ' + res.getContentText());
+  }
+  const token = JSON.parse(res.getContentText()).access_token;
+  cache.put('ms_graph_token', token, 50 * 60);
+  return token;
+}
+
+/** Send through Microsoft 365 when configured, otherwise through Google. */
+function sendMail_(o) {
+  const cfg = msConfig_();
+  if (cfg) {
+    try {
+      const recipients = String(o.to).split(',').map(function (a) {
+        return { emailAddress: { address: a.trim() } };
+      });
+      const message = {
+        subject: o.subject,
+        body: o.htmlBody ? { contentType: 'HTML', content: o.htmlBody }
+                         : { contentType: 'Text', content: o.body || '' },
+        toRecipients: recipients
+      };
+      if (o.replyTo) message.replyTo = [{ emailAddress: { address: o.replyTo } }];
+      const res = UrlFetchApp.fetch(
+        'https://graph.microsoft.com/v1.0/users/' + encodeURIComponent(cfg.sender) + '/sendMail', {
+          method: 'post',
+          contentType: 'application/json',
+          headers: { Authorization: 'Bearer ' + msToken_(cfg) },
+          payload: JSON.stringify({ message: message, saveToSentItems: true }),
+          muteHttpExceptions: true
+        });
+      if (res.getResponseCode() === 202) return 'microsoft';
+      throw new Error('Graph sendMail ' + res.getResponseCode() + ': ' + res.getContentText());
+    } catch (err) {
+      console.error('Microsoft 365 send failed, using Google instead: ' + err);
+    }
+  }
+  MailApp.sendEmail(o);
+  return 'google';
+}
+
+/** Run once after saving the Script Properties: emails NOTIFY_EMAIL a test. */
+function testMicrosoftMail() {
+  if (!msConfig_()) {
+    throw new Error('Microsoft 365 is not set up yet: add MS_TENANT_ID, MS_CLIENT_ID and MS_CLIENT_SECRET in Project Settings > Script Properties.');
+  }
+  CacheService.getScriptCache().remove('ms_graph_token');
+  const via = sendMail_({
+    to: NOTIFY_EMAIL,
+    subject: BRAND_NAME + ' website: Microsoft 365 email test',
+    body: 'If you are reading this, website emails are being sent through Microsoft 365.'
+  });
+  if (via !== 'microsoft') {
+    throw new Error('Microsoft 365 refused the email, so it was sent through Google instead. Open Executions to see the reason.');
+  }
+  return 'Sent through Microsoft 365 to ' + NOTIFY_EMAIL;
 }
 
 /** Light email sanity check so we don't send auto-replies to junk. */
